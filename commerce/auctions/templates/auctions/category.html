@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        {% for category in categories %}
+            <a href="{% url 'category_with_id' category.id %}">{{ category.cname }}</a>
+        {% endfor %}
+    </div>
+
+    {% if selected_category %}
+        <h3>Listings in {{ selected_category.cname }}</h3>
+    {% else %}
+        <h3>All Active Listings</h3>
+    {% endif %}
+    
+    {% for listing in listings %}
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="{{listing.imageURL}}" alt="{{listing.title}}">
+        <div class="card-body">
+          <h5 class="card-title">{{listing.title}}</h5>
+          <p class="card-text">{{listing.desc}}</p>
+          <a href="{% url 'listing' listing.id %}" class="btn btn-primary">Detail</a>
+        </div>
+      </div>
+    {% endfor %}
+{% endblock %}

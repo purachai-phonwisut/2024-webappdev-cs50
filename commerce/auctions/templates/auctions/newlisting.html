@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Create Listing</h2>
 
-    <form action="{% url 'createlisting' %}" method = "POST">
+    <form action="{% url 'newlisting' %}" method = "POST">
         {% csrf_token %}
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
@@ -14,8 +14,8 @@
             <input type="text" name = "desc" class="form-control" id="desc">
           </div>
           <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="text" name = "price" class="form-control" id="price">
+            <label for="startbid" class="form-label">Start Bids</label>
+            <input type="text" name = "startbid" class="form-control" id="startbid">
           </div>
           <div class="mb-3">
             <label for="imageURL" class="form-label">ImageURL</label>
