@@ -3,8 +3,10 @@
 {% block body %}
     <h2>Active Listings</h2>
 
+
+
     {% for listing in open %}
-    <div class="card" style="width: 18rem;">
+      <div class="card" style="width: 18rem;">
         <img class="card-img-top" src="{{listing.imageURL}}" alt="{{listing.title}}">
         <div class="card-body">
           <h5 class="card-title">{{listing.title}}</h5>

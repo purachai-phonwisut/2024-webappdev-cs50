@@ -79,11 +79,9 @@ def activelisting(request):
 def category(request, category_id=None):
     categories = Category.objects.all()
     if category_id:
-        # If a category_id is provided, filter listings by that category
         listings = Listing.objects.filter(category_id=category_id, isactive=True)
         selected_category = get_object_or_404(Category, pk=category_id)
     else:
-        # If no category_id, just display all categories without filtering listings
         listings = Listing.objects.filter(isactive=True)
         selected_category = None
     
