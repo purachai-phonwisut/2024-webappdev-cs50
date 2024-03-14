@@ -72,3 +72,72 @@ h1 {
     clear: both;
     display: table;
 }
+
+/* Listing Page Styles */
+
+/* Listing Details */
+.listing-details {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listing-details h2, .listing-details h4 {
+    color: #333;
+}
+
+.listing-details img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+    padding: 20px 0;
+}
+
+/* Forms and Buttons */
+.btn {
+    margin-top: 10px;
+}
+
+form {
+    text-align: left;
+    margin-top: 20px;
+}
+
+input[type="number"], textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-top: 5px;
+}
+
+/* Comments */
+.comments-section {
+    margin-top: 40px;
+}
+
+.comment {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid #007bff;
+}
+
+.comment strong {
+    color: #007bff;
+}
+
+/* Watchlist and Auction Status Messages */
+.watchlist-msg, .auction-status {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Enhance visibility of bid and comment forms */
+form label, form button, form input[type="submit"] {
+    display: block;
+    margin: auto;
+    text-align: left;
+}
+

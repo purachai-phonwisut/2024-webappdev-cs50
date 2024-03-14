@@ -184,6 +184,9 @@ def bid(request, listing_id):
         listing.currentbid = Bid.objects.latest('id')
         listing.save()
 
+        # Add a success message
+        messages.success(request, "Your bid was placed successfully!")
+
         return redirect('listing', listing_id=listing_id)
 
 
