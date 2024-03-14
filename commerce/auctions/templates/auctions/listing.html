@@ -2,31 +2,35 @@
 
 {% block body %}
 
-    {%if user.is_authenticated %}
-        {%if isinwatchlist %}
-            <form action="{% url 'removewatchlist' listing.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Remove</button>
-            </form>
-                {%else %}
-                <form action="{% url 'addwatchlist' listing.id %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Add</button>
-                </form>
-        {% endif %}
-    {% endif %}
+    
+
+{%if user.is_authenticated %}
+{%if isinwatchlist %}
+    <h5>In Watchlist:</h5>
+    <form action="{% url 'removewatchlist' listing.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Remove</button>
+    </form>
+        {%else %}
+        <h5>Not In Watchlist:</h5>
+        <form action="{% url 'addwatchlist' listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+{% endif %}
+{% endif %}
+<h2>Listing: {{ listing.title }}</h2>
+
+<img src="{{ listing.imageURL }}" alt="{{ listing.title }}" style="width:400px">
 
 
+    
 
+    
 
-
-    <h2>Listing: {{ listing.title }}</h2>
-    <img src="{{ listing.imageURL }}" alt="{{ listing.title }}" style="width:400px">
     <p>{{listing.desc}}</p>
     <h4>Start Bids: ${{ listing.startbid }}</h4>
-    {% if listing.currentbid %}
         <h4>Current Bid: ${{ listing.currentbid.bid }}</h4>
-    {% endif %}
     <h4>Category: {{ listing.category }}</h4>
     <h4>Seller: {{ listing.seller }}</h4>
 
@@ -39,17 +43,18 @@
         {% endif %}
     {% else %}
         {% if user != listing.seller %}
-            <form action="" method="post">
-                {% csrf_token %}
-                <label for="bid_amount">Your Bid:</label>
-                <input type="number" name="bid_amount" required>
-                <button type="submit" name="bid">Place Bid</button>
-            </form>
+            <!-- Update action to submit to 'bid' view -->
+<form action="{% url 'bid' listing.id %}" method="post">
+    {% csrf_token %}
+    <label for="bid_amount">Your Bid:</label>
+    <input type="number" name="bid_amount" required>
+    <button type="submit" name="bid">Place Bid</button>
+</form>
         {% else %}
-            <form action="" method="post">
-                {% csrf_token %}
-                <button type="submit" name="close_auction">Close Auction</button>
-            </form>
+        <form action="{% url 'close_auction' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" name="close_auction">Close Auction</button>
+        </form>
         {% endif %}
     {% endif %}
 

@@ -2,15 +2,19 @@
 
 {% block body %}
     <div>
+        <ul>
         {% for category in categories %}
+            <li>
             <a href="{% url 'category_with_id' category.id %}">{{ category.cname }}</a>
+            </li>
         {% endfor %}
+        </ul>
     </div>
 
     {% if selected_category %}
         <h3>Listings in {{ selected_category.cname }}</h3>
-    {% else %}
-        <h3>All Active Listings</h3>
+     {% else %}
+        <h3></h3>
     {% endif %}
     
     {% for listing in listings %}

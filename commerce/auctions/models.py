@@ -26,10 +26,10 @@ class Listing(models.Model):
 class Bid(models.Model):
     bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
     item = models.ForeignKey(Listing, on_delete=models.CASCADE)
-    bid = models.IntegerField()
+    bid = models.FloatField()
 
     def __str__(self):
-        return f"{self.bidder.username} - {self.bid}"
+        return f"{self.bid}"
 
 class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ownercomment",blank=True, null= True)

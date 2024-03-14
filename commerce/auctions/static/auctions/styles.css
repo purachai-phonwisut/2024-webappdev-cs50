@@ -1,3 +1,74 @@
+
+/* General body styles */
 body {
+    font-family: Arial, sans-serif;
+    margin: 0;
     padding: 10px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Navigation styles */
+.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #007bff;
+    overflow: hidden;
+}
+
+.nav-item {
+    float: left;
+}
+
+.nav-link {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #0056b3;
+}
+
+/* Utilities */
+.alert {
+    margin: 20px;
+    padding: 20px;
+    color: white;
+}
+
+.alert-info {
+    background-color: #17a2b8;
+}
+
+.alert-success {
+    background-color: #28a745;
+}
+
+.alert-warning {
+    background-color: #ffc107;
+}
+
+.alert-danger {
+    background-color: #dc3545;
+}
+
+/* Custom container for content below nav */
+.content-container {
+    padding: 20px;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
 }

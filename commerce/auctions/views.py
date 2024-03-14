@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
@@ -128,8 +128,17 @@ def watchlist(request):
 def listing(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
     isinwatchlist = Watchlist.objects.filter(user=request.user, listing=listing).exists()
-    return render(request, 'auctions/listing.html', {'listing': listing, 'isinwatchlist': isinwatchlist})
 
+    # Check if the current user is the winner of the auction
+    is_winner = False
+    if not listing.isactive and listing.currentbid and listing.currentbid.bidder == request.user:
+        is_winner = True
+
+    return render(request, 'auctions/listing.html', {
+        'listing': listing,
+        'isinwatchlist': isinwatchlist,
+        'is_winner': is_winner  # Pass the is_winner variable to the template
+    })
 @login_required
 def comment(request, listing_id):
     if request.method == "POST":
@@ -156,5 +165,36 @@ def removewatchlist(request, listing_id):
     return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
 
 @login_required
-def bid(request):
-    return
+def bid(request, listing_id):
+    if request.method == "POST":
+        listing = get_object_or_404(Listing, pk=listing_id)
+        bid_amount = float(request.POST.get("bid_amount"))
+
+        if not listing.isactive:
+            messages.error(request, "This auction is closed.")
+            return redirect('listing', listing_id=listing_id)
+
+        if bid_amount < listing.startbid or (listing.currentbid and bid_amount <= listing.currentbid.bid):
+            messages.error(request, "Your bid must be higher than the current bid.")
+            return redirect('listing', listing_id=listing_id)
+
+        Bid.objects.create(bidder=request.user, item=listing, bid=bid_amount)
+        
+        # Update current bid in listing
+        listing.currentbid = Bid.objects.latest('id')
+        listing.save()
+
+        return redirect('listing', listing_id=listing_id)
+
+
+@login_required
+def close_auction(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    if request.user == listing.seller and listing.isactive:
+        listing.isactive = False
+        listing.save()
+        messages.success(request, "Auction closed successfully.")
+        return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+    else:
+        messages.error(request, "You are not authorized to close this auction.")
+        return HttpResponseRedirect(reverse("listing", args=(listing_id,)))

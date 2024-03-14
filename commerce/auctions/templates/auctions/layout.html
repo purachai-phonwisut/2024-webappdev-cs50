@@ -8,6 +8,11 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
         <h1>Auctions</h1>
         <div>
             {% if user.is_authenticated %}
