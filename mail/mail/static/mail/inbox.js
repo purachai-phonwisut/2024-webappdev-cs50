@@ -33,11 +33,12 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
 
-function send_email() {
+function send_email(event) {
 
-  let body = document.querySelector('#compose-body')
-  let recipients = document.querySelector('#compose-recipients')
-  let subject = document.querySelector('#compose-subject')
+  event.preventDefault();
+  let body = document.querySelector('#compose-body').value
+  let recipients = document.querySelector('#compose-recipients').value
+  let subject = document.querySelector('#compose-subject').value
 
   fetch('/emails', {
     method: 'POST',
@@ -52,4 +53,6 @@ function send_email() {
       // Print result
       console.log(result);
   });
+
+  load_mailbox()
 }
