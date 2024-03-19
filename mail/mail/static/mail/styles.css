@@ -1,3 +1,28 @@
 textarea {
     min-height: 400px;
 }
+
+.email-item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 5px;
+    width:90%;
+}
+
+.mail-list-container {
+    display: flex;
+    flex-grow: 1; /* Allows it to expand and fill available space, pushing the button to the end */
+    justify-content: space-between;
+}
+
+.mail-float-start {
+    font-weight: bold;
+}
+
+.mail-float-mid {
+    margin-left: 20px;
+    text-align:left; /* Adjust as needed */
+}
