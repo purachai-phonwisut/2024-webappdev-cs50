@@ -1,28 +1,51 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
 textarea {
     min-height: 400px;
 }
 
-.email-item-container {
+.email-item-container-read, .email-item-container-unread {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     border: 1px solid black;
     margin: 5px;
     padding: 5px;
-    width:90%;
+    width: 90%;
 }
 
 .mail-list-container {
     display: flex;
-    flex-grow: 1; /* Allows it to expand and fill available space, pushing the button to the end */
     justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
 }
 
-.mail-float-start {
+.email-item-container-read:hover, .email-item-container-unread:hover {
+    background-color: burlywood;
+    cursor: pointer;
+}
+
+.email-item-container-read {
+    background-color: rgb(214, 212, 212);
+}
+
+.email-item-container-unread {
+    background-color: white;
+}
+
+.mail-float-start, .mail-float-mid, .mail-float-end {
+    margin: 0 10px;
+}
+
+.mail-float-start{
     font-weight: bold;
 }
 
-.mail-float-mid {
-    margin-left: 20px;
-    text-align:left; /* Adjust as needed */
+.mail-archive-button {
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
 }

@@ -1,23 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Use buttons to toggle between views
+  // toggle between views
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
   document.querySelector('#compose-form').addEventListener('submit',send_email);
-
-  // By default, load the inbox
+  window.addEventListener('popstate', function(event) {
+    if (event.state && event.state.mailbox) {
+      load_mailbox(event.state.mailbox);
+    } else {
+      // Default to inbox or any other default state
+      load_mailbox('inbox');
+    }
+  });
   load_mailbox('inbox');
 });
 
 function load_mailbox(mailbox) {
-  // Show the mailbox and hide other views
+
+  window.history.pushState({mailbox: mailbox}, "", `#${mailbox}`);
+
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#get-email').innerHTML = '';
-
-  // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
   fetch(`/emails/${mailbox}`, {
@@ -25,12 +31,11 @@ function load_mailbox(mailbox) {
   })
   .then(response => response.json())
   .then(emails => {
-    console.log(emails);
     const email_view = document.getElementById('emails-view');
 
     emails.forEach(item => {
       let shouldShow = false;
-      let buttonText = ''; // Text for the archive/unarchive button
+      let buttonText = '';
       if (mailbox === 'archive') {
         shouldShow = item.archived;
         buttonText = 'Unarchive';
@@ -38,38 +43,40 @@ function load_mailbox(mailbox) {
         shouldShow = !item.archived;
         buttonText = 'Archive';
       } else if (mailbox === 'sent') {
-        shouldShow = true; // Always show in sent, but without archive button
+        shouldShow = true;
       }
-    
+
       if (shouldShow) {
         const email_div = document.createElement('div');
-        email_div.classList.add('email-summary');
-        email_div.innerHTML = `
-        <div class="email-item-container">
-          <div class="mail-list-container">
-            <span class="mail-float-start">${item.sender}</span>
-            <span class="mail-float-mid">${item.subject}</span>
-            <span class="mail-float-end">${item.timestamp}</span>
-          </div>
-        </div>`;
-    
+        email_div.className = 'email-summary ' + (item.read ? 'email-item-container-read' : 'email-item-container-unread');
+        const mailListContainer = document.createElement('div');
+        mailListContainer.className = 'mail-list-container';
+
+        mailListContainer.innerHTML = `
+          <span class="mail-float-start">${item.sender}</span>
+          <span class="mail-float-mid">${item.subject}</span>
+          <span class="mail-float-end">${item.timestamp}</span>
+        `;
+
         if (mailbox === 'inbox' || mailbox === 'archive') {
           const button = document.createElement('button');
           button.textContent = buttonText;
+          button.className = 'mail-archive-button'; // Assign a class for styling
           button.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent triggering the email open action
+            e.stopPropagation();
             toggleArchiveStatus(item.id, item.archived);
           });
-          email_div.appendChild(button);
+          mailListContainer.appendChild(button);
         }
-    
+
+        email_div.appendChild(mailListContainer);
         email_div.addEventListener('click', () => get_email(item.id));
         email_view.appendChild(email_div);
       }
     });
-    
   });
 }
+
 
 function compose_email() {
 
@@ -121,12 +128,15 @@ function get_email(email_id) {
   .then(email => {
     const get_email = document.getElementById('get-email');
     get_email.innerHTML = `
-    <h3>${email.subject}</h3>
-    <div id="email-sender">From: ${email.sender}</div>
-    <div id="email-recipients">To: ${email.recipients}</div>
-    <div id="email-body">${email.body}</div>
+    <div id="email-sender"><b>From:</b> ${email.sender}</div>
+    <div id="email-recipients"><b>To:</b> ${email.recipients}</div>
+    <div id="email-subject"><b>Subject:</b> ${email.subject}</div>
 
     <button class="reply-btn">Reply</button>
+    <hr style="height:1px;border-width:0;color:gray;background-color:gray">
+
+    <div id="email-body"><b>Body:</b> 
+    ${email.body}</div>
 
     `
     document.querySelector('.reply-btn').addEventListener('click', () => reply_email(email));
@@ -175,4 +185,8 @@ function reply_email(email) {
   document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
   document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote:
   ${email.body}`;
+}
+
+function goBack() {
+  window.history.back();
 }
