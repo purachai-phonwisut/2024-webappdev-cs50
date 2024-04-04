@@ -1,15 +1,62 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
-
-from .models import User
+from django.contrib.auth.decorators import login_required
+from .forms import PostForm
+from .models import User,Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.all().order_by('-timestamp')
+    return render(request, "network/index.html", {'posts':posts})
 
+def following(request):
+    return render(request, "network/following.html")
+
+@login_required
+def new(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            Post.objects.create(
+                content=form.cleaned_data['content'],
+                user=request.user
+            )
+
+        return redirect('index')
+
+    else:
+        return render(request, "network/new.html")
+
+
+def get_follower_count(user):
+    return Relationship.objects.filter(following=user).count()
+
+def get_following_count(user):
+    return Relationship.objects.filter(follower=user).count()
+
+
+@login_required
+def profile(request, userID):
+    userProfile = get_object_or_404(User, pk=userID)
+    userPosts = Post.objects.filter(user=userProfile).order_by('-timestamp')
+
+
+    context = {
+        'userProfile': userProfile,
+        'userPosts': userPosts,
+    }
+
+    return render(request, "network/profile.html", context)
+
+def post(request,postID):
+       
+    return
+
+def edit(request,postID):
+    return
 
 def login_view(request):
     if request.method == "POST":

@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+{{ userProfile }}
+
+Follower count: <span id="follower-count">{{ follower_count }}</span>
+Following count: <span id="following-count">{{ following_count }}</span>
+
+
+
+<h2>User Posts:</h2>
+{% for post in userPosts %}
+    <div>
+        <p>{{ post.content }}</p>
+        <p>Posted by: {{ post.user.username }}</p>
+        <p>Posted at: {{ post.timestamp }}</p>
+    </div>
+{% empty %}
+    <p>This user hasn't posted anything yet.</p>
+{% endfor %}
+
+{% endblock %}

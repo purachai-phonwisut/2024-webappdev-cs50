@@ -1,5 +1,18 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+<h1>All Posts</h1>
+<div>
+    {% for post in posts %}
+        <div>
+            <h2><a href="{% url 'profile' post.user.id %}">{{ post.user.username }}</a></h2>
+            <p>{{ post.content }}</p>
+            <p>{{ post.timestamp|date:"d-m-Y h:m:s" }}</p>
+        </div>
+    {% empty %}
+        <p>No posts have been made yet.</p>
+    {% endfor %}
+</div>
+
+
 {% endblock %}
