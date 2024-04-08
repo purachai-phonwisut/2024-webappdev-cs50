@@ -14,5 +14,5 @@ urlpatterns = [
     path("new", views.new, name="new"),
     path('like', views.like, name='like'),
     path('follow_toggle', views.follow_toggle, name='follow_toggle'),
-
+    path("user/<int:userID>/follow_counts", views.get_follow_counts, name="get_follow_counts"),
 ]

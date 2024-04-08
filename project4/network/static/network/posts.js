@@ -1,22 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Edit functionality
     document.querySelectorAll('.edit-btn').forEach(button => {
         button.onclick = function() {
             const postId = this.getAttribute('data-postid');
             const contentDiv = document.getElementById(`post-content-${postId}`);
             const content = contentDiv.innerText;
 
-            // Replace the post's content with a textarea and a save button
             contentDiv.innerHTML = `
                 <textarea id="edit-text-${postId}" rows="4">${content}</textarea>
                 <button class="save-btn" data-postid="${postId}">Save</button>
             `;
 
-            // Save button functionality
             document.querySelector(`.save-btn[data-postid="${postId}"]`).onclick = function() {
                 const newText = document.getElementById(`edit-text-${postId}`).value;
 
-                // AJAX request to save the updated content
                 fetch(`/post/${postId}/edit`, {
                     method: 'POST',
                     body: JSON.stringify({
@@ -42,9 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     });
 
-    // Like functionality
     document.querySelectorAll('.like-btn').forEach(button => {
-        button.onclick = function() {
+        button.addEventListener('click', function() {
             const postId = this.getAttribute('data-postid');
             fetch('/like', {
                 method: 'POST',
@@ -69,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let likeCount = parseInt(likeCountSpan.innerText, 10);
                     likeCount = data.action === 'liked' ? likeCount + 1 : likeCount - 1;
                     likeCountSpan.innerText = likeCount.toString();
+                    this.textContent = data.action === 'liked' ? 'Unlike' : 'Like';
                 } else {
                     alert("There was an error processing the like.");
                 }
@@ -76,8 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error:', error);
             });
-        };
-    });
+        });
+    }); 
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -92,4 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('not-authenticated');
+
+    likeButton.addEventListener('click', function() {
+        alert('Please log in before liking a post.');
+    });
 });

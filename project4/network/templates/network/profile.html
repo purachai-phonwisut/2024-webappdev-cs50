@@ -1,10 +1,13 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-{{ userProfile }}
 
-Follower count: <span id="follower-count">{{ follower_count }}</span>
-Following count: <span id="following-count">{{ following_count }}</span>
+<div class="usersection">
+    <h2>Profile</h2>
+<div class = "user">User : {{ userProfile }}</div>
+
+Follower: <span id="follower-count">{{ follower_count }}</span>
+Following: <span id="following-count">{{ following_count }}</span>
 
 {% if current_user != userProfile %}
     <button id="follow-btn" class="follow-btn" data-userid="{{ userProfile.id }}">
@@ -15,65 +18,149 @@ Following count: <span id="following-count">{{ following_count }}</span>
         {% endif %}
     </button>
 {% endif %}
+</div>
 
-<h2>User Posts:</h2>
-{% for post in userPosts %}
-    <div>
-        <p>{{ post.content }}</p>
-        <p>Posted by: {{ post.user.username }}</p>
-        <p>Posted at: {{ post.timestamp }}</p>
+<h2 class="title" style="margin-top:50px">User Posts:</h2>
+
+<div>
+    {% for post in page_obj %}
+    <div class = "post-box">
+    
+        <h2><a href="{% url 'profile' post.user.id %}" class="post-user">{{ post.user.username }}</a>
+            <span class="post-time">{{ post.timestamp|date:"d-m-Y h:m:s" }}</span>
+            <span>{% if user == post.user %}
+            <button class="edit-btn" data-postid="{{ post.id }}">Edit</button>
+            {% endif %}</span>
+        
+        </h2>
+        
+            <div id="post-{{ post.id }}">
+            <div class="post-content" id="post-content-{{ post.id }}">{{ post.content }}</div>
+            
+        </div>
+        
+        
+
+        {% if user.is_authenticated %}
+        <div class="like-section">
+            <button class="like-btn" data-postid="{{ post.id }}">Like</button>
+            <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+        </div>
+        {% else %}
+        <div class="like-section">
+            <h4 class="like-h4">Like: <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span></h4>
+            
+        </div>
+        {%endif%}
+
     </div>
 {% empty %}
-    <p>This user hasn't posted anything yet.</p>
+    <p class="empty">No posts have been made yet.</p>
 {% endfor %}
 
-<script>
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo;</span>
+      </li>
+      {% endif %}
+  
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">{{ num }}</span>
+        </li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+  
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+
+  <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('follow-btn').onclick = function() {
-        const otherUserId = this.getAttribute('data-userid');
-        fetch(`/follow_toggle`, {
-            method: 'POST',
-            body: new URLSearchParams({
-                'other_user_id': otherUserId,
-            }),
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "ok") {
-                // Optionally update the UI to reflect the follow/unfollow action
-                if (data.action === 'followed') {
-                    this.innerText = "Unfollow";
-                } else if (data.action === 'unfollowed') {
-                    this.innerText = "Follow";
-                }
-            } else {
-                alert("There was an error processing the follow request.");
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    };
-});
-</script>
-
+    
+    function adjustFollowCounts(action) {
+        const followerCountElement = document.getElementById('follower-count');
+        let followerCount = parseInt(followerCountElement.innerText);
+        
+        if (action === 'followed') {
+            followerCount += 1;
+        } else if (action === 'unfollowed') {
+            followerCount -= 1;
+        }
+        
+        followerCountElement.innerText = followerCount.toString();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const followBtn = document.getElementById('follow-btn');
+        if (followBtn) {
+            followBtn.addEventListener('click', function() {
+                const otherUserId = this.getAttribute('data-userid');
+                fetch(`/follow_toggle`, {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'other_user_id': otherUserId,
+                    }),
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "ok") {
+                        if (data.action === 'followed') {
+                            this.innerText = "Unfollow";
+                            adjustFollowCounts('followed');
+                        } else if (data.action === 'unfollowed') {
+                            this.innerText = "Follow";
+                            adjustFollowCounts('unfollowed');
+                        }
+                    } else {
+                        alert("There was an error processing the follow request.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        }
+    });
+    </script>
+    
 {% endblock %}
