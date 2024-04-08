@@ -28,3 +28,7 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.user} is following {self.user_follower}"
+    
+    @classmethod
+    def is_following(cls, current_user, other_user):
+        return cls.objects.filter(user=current_user, user_follower=other_user).exists()

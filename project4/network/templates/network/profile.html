@@ -6,7 +6,15 @@
 Follower count: <span id="follower-count">{{ follower_count }}</span>
 Following count: <span id="following-count">{{ following_count }}</span>
 
-
+{% if current_user != userProfile %}
+    <button id="follow-btn" class="follow-btn" data-userid="{{ userProfile.id }}">
+        {% if is_following %}
+            Unfollow
+        {% else %}
+            Follow
+        {% endif %}
+    </button>
+{% endif %}
 
 <h2>User Posts:</h2>
 {% for post in userPosts %}
@@ -18,5 +26,54 @@ Following count: <span id="following-count">{{ following_count }}</span>
 {% empty %}
     <p>This user hasn't posted anything yet.</p>
 {% endfor %}
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('follow-btn').onclick = function() {
+        const otherUserId = this.getAttribute('data-userid');
+        fetch(`/follow_toggle`, {
+            method: 'POST',
+            body: new URLSearchParams({
+                'other_user_id': otherUserId,
+            }),
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                // Optionally update the UI to reflect the follow/unfollow action
+                if (data.action === 'followed') {
+                    this.innerText = "Unfollow";
+                } else if (data.action === 'unfollowed') {
+                    this.innerText = "Follow";
+                }
+            } else {
+                alert("There was an error processing the follow request.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+});
+</script>
 
 {% endblock %}

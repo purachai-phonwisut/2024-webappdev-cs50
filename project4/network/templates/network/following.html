@@ -1,5 +1,45 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    Following
-{% endblock %}  
+<h1>My followings</h1>
+<div>
+    {% for post in page_obj %}
+    <div>
+        <div id="post-{{ post.id }}">
+            <div id="post-content-{{ post.id }}">{{ post.content }}</div>
+            {% if user == post.user %}
+            <!-- Adding an edit button with a data attribute -->
+            <button class="edit-btn" data-postid="{{ post.id }}">Edit</button>
+            {% endif %}
+        </div>
+        <h2><a href="{% url 'profile' post.user.id %}">{{ post.user.username }}</a></h2>
+        <p>{{ post.timestamp|date:"d-m-Y h:m:s" }}</p>
+        <div class="like-section">
+            <button class="like-btn" data-postid="{{ post.id }}">Like</button>
+            <span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>
+        </div>
+    </div>
+{% empty %}
+    <p>No posts have been made yet.</p>
+{% endfor %}
+</div>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}
